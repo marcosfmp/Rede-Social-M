@@ -13,6 +13,7 @@ function loginPage() {
       <input type="text" id="loginUser" placeholder="Usuário" required />
       <input type="password" id="loginPass" placeholder="Senha" required />
       <button type="submit">Entrar</button>
+      <a href="#/signup">Não tem conta? Cadastre-se</a>
     </form>
   `;
 
@@ -21,18 +22,22 @@ function loginPage() {
     const username = document.getElementById('loginUser').value;
     const password = document.getElementById('loginPass').value;
 
-    const res = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      window.location.hash = '#/home';
-    } else {
-      alert('Erro ao fazer login');
+      const data = await res.json();
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        window.location.hash = '#/home';
+      } else {
+        alert(data.error || 'Erro ao fazer login');
+      }
+    } catch (err) {
+      alert('Erro de conexão com o servidor');
     }
   };
 }
@@ -44,6 +49,7 @@ function signupPage() {
       <input type="text" id="signupUser" placeholder="Usuário" required />
       <input type="password" id="signupPass" placeholder="Senha" required />
       <button type="submit">Cadastrar</button>
+      <a href="#/">Já tem conta? Faça login</a>
     </form>
   `;
 
@@ -52,26 +58,32 @@ function signupPage() {
     const username = document.getElementById('signupUser').value;
     const password = document.getElementById('signupPass').value;
 
-    const res = await fetch('http://localhost:5000/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-    if (res.ok) {
-      alert('Conta criada! Faça login.');
-      window.location.hash = '#/';
-    } else {
-      alert('Erro ao cadastrar');
+      if (res.ok) {
+        alert('Conta criada! Faça login.');
+        window.location.hash = '#/';
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Erro ao cadastrar');
+      }
+    } catch (err) {
+      alert('Erro de conexão com o servidor');
     }
   };
 }
 
 function homeFeed() {
   app.innerHTML = `
-    <div>
+    <div style="padding: 2rem; text-align: center;">
       <h1>Bem-vindo ao M!</h1>
       <p>Feed de postagens aqui...</p>
+      <a href="#/">Sair</a>
     </div>
   `;
 }
@@ -83,21 +95,4 @@ function router() {
 }
 
 window.addEventListener('hashchange', router);
-window.addEventListener('load', router);
-
-// Função para navegar entre páginas
-function router() {
-  const hash = window.location.hash.replace('#', '') || '/';
-  const route = routes[hash];
-
-  if (route) {
-    route();
-  } else {
-    app.innerHTML = '<p>Página não encontrada.</p>';
-  }
-}
-
-// Corrige navegação manual e atualiza ao abrir
-window.addEventListener('hashchange', router);
-window.addEventListener('DOMContentLoaded', router); // <-- Essa é importante
-
+window.addEventListener('DOMContentLoaded', router);
