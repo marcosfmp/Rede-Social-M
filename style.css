@@ -29,3 +29,15 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
+
+a {
+  text-align: center;
+  display: block;
+  margin-top: 10px;
+  color: #9F7AEA;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
