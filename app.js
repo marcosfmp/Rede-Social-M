@@ -84,3 +84,20 @@ function router() {
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
+
+// Função para navegar entre páginas
+function router() {
+  const hash = window.location.hash.replace('#', '') || '/';
+  const route = routes[hash];
+
+  if (route) {
+    route();
+  } else {
+    app.innerHTML = '<p>Página não encontrada.</p>';
+  }
+}
+
+// Corrige navegação manual e atualiza ao abrir
+window.addEventListener('hashchange', router);
+window.addEventListener('DOMContentLoaded', router); // <-- Essa é importante
+
